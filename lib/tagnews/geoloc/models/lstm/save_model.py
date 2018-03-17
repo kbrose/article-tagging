@@ -15,6 +15,12 @@ if saved_files:
         print('Exiting.')
         exit()
 
+import sys
+if len(sys.argv) == 1:
+    num_epochs = 20
+else:
+    num_epochs = int(sys.argv[1])
+
 
 from .... import utils
 import pandas as pd
@@ -116,12 +122,13 @@ class OurAUC(keras.callbacks.Callback):
 our_auc = OurAUC()
 
 model.fit(x_train, y_train,
-          epochs=20,
+          epochs=num_epochs,
           validation_data=(x_val, y_val),
           callbacks=[our_auc, checkpointer],
           verbose=2)
 
 idx = slice(501, 550)
+pd.set_option('display.width', 200)
 print(pd.concat([ner.iloc[idx, :3].reset_index(drop=True),
                  pd.DataFrame(model.predict(np.expand_dims(ner.iloc[idx, 3:].values, 0))[0][:, 1:],
                               columns=['prob_geloc'])],
